@@ -21,7 +21,7 @@ exports.rule = {
           gotFirst = true;
           const parent = expression.parent;
           if (parent.type !== 'ExpressionStatement') {
-            return context.report(expression, 'Expected goog.provide() to in an expression statement');
+            return context.report(expression, 'Expected goog.provide() to be in an expression statement');
           }
 
           if (parent.parent.type !== 'Program') {
@@ -29,12 +29,12 @@ exports.rule = {
           }
 
           if (expression.arguments.length !== 1) {
-            return context.report(expression, 'Expected one argument for goog.require()');
+            return context.report(expression, 'Expected one argument for goog.provide()');
           }
 
           const arg = expression.arguments[0];
           if (arg.type !== 'Literal' || !arg.value || typeof arg.value !== 'string') {
-            return context.report(expression, 'Expected goog.require() to be called with a string');
+            return context.report(expression, 'Expected goog.provide() to be called with a string');
           }
 
           const filePath = context.getFilename();
