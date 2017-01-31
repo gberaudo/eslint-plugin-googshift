@@ -14,8 +14,6 @@ const util = require('./util');
  *   but ol.ext.foo would require ol.ext.foo)
  */
 
-const CONST_RE = /^(ol(\.[a-z]\w*)*)\.[A-Z]+_([_A-Z])+$/;
-const CLASS_RE = /^(ol(\.[a-z]\w*)*\.[A-Z]\w*)(\.\w+)*$/;
 
 exports.rule = {
   meta: {
@@ -27,11 +25,16 @@ exports.rule = {
 
   create: function(context) {
     const defined = {};
+    const prefixes = context.options[0].prefixes || ['ol'];
+    const joined = prefixes.join('|');
+    const CONST_RE = new RegExp(`^((?:${joined})(\\.[a-z]\\w*)*)\\.[A-Z]+_([_A-Z])+$`);
+    const CLASS_RE = new RegExp(`^((?:${joined})(\\.[a-z]\\w*)*\\.[A-Z]\\w*)(\\.\\w+)*$`);
+    const STARTS_WITH = new RegExp(`^(?:${joined})\\..*`);
 
     return {
 
       ExpressionStatement: function(statement) {
-        if (util.isRequireStatement(statement) || util.isProvideStatement(statement)) {
+        if (util.isRequireStatement(statement) || util.isRequireVariableDeclaration(statement) || util.isProvideStatement(statement)) {
           const expression = statement.expression;
           const arg = expression.arguments[0];
           if (!arg || !arg.value) {
@@ -43,9 +46,17 @@ exports.rule = {
 
       MemberExpression: function(expression) {
         const parent = expression.parent;
+        if (parent.type === 'AssignmentExpression') {
+          const name = util.getName(expression);
+          if (name && STARTS_WITH.test(name)) {
+            defined[name] = true;
+            return;
+          }
+        }
+
         if (parent.type !== 'MemberExpression') {
           const name = util.getName(expression);
-          if (name && name.startsWith('ol.')) {
+          if (name && STARTS_WITH.test(name) && !defined[name]) {
             // check if the name looks like a const
             let match = name.match(CONST_RE);
             if (match) {
@@ -70,8 +81,9 @@ exports.rule = {
                 }
                 return;
               }
-              if (!defined[className]) {
-                context.report(expression, `Missing goog.require('${className}')`);
+              const parentObjectName = className.split('.').slice(0, -1).join('.'); // app.constants.RouteType enum in constants namespace
+              if (!defined[className] && !defined[parentObjectName]) {
+                context.report(expression, `Missing goog.require('${className}') or goog.require('${parentObjectName}')`);
               }
               return;
             }
@@ -82,13 +94,13 @@ exports.rule = {
               parts.pop();
             }
             const objectName = parts.join('.');
-            if (!defined[objectName]) {
-              context.report(expression, `Missing goog.require('${objectName}')`);
+            const parentObjectName = parts.slice(0, -1).join('.'); // app.widgets.sortable.dragOptionsDirective.module
+            if (!defined[objectName] && !defined[parentObjectName]) {
+              context.report(expression, `Missing goog.require('${objectName}') or goog.require('${parentObjectName}')`);
             }
           }
         }
       }
-
     };
   }
 };

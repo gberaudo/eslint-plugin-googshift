@@ -13,6 +13,31 @@ function isGoogStatement(node, name) {
     isGoogCallExpression(node.expression, name);
 }
 
+function isGoogVariableDeclaration(node, name) {
+  return node.type === 'VariableDeclaration' && node.declarations &&
+    node.declarations.length > 0 && isGoogCallExpression(node.declarations[0].init, name);
+}
+
+exports.isModuleExpression = function(node) {
+  return isGoogCallExpression(node, 'module');
+};
+
+exports.isModuleStatement = function(node) {
+  return isGoogStatement(node, 'module');
+};
+
+exports.isModuleLegacyStatement = function(node) {
+  if (!node.expression || !node.expression.callee || !node.expression.callee.object) {
+    return false;
+  }
+  const callee = node.expression.callee;
+  return node.expression.type === 'CallExpression' &&
+    callee.object && callee.object.object &&
+    callee.object.object && callee.object.object.name === 'goog' &&
+    callee.object.property && callee.object.property.name === 'module' &&
+    callee.property && callee.property.name === 'declareLegacyNamespace';
+}
+
 exports.isProvideExpression = function(node) {
   return isGoogCallExpression(node, 'provide');
 };
@@ -27,6 +52,10 @@ exports.isRequireExpression = function(node) {
 
 exports.isRequireStatement = function(node) {
   return isGoogStatement(node, 'require');
+};
+
+exports.isRequireVariableDeclaration = function(node) {
+  return isGoogVariableDeclaration(node, 'require');
 };
 
 var getName = exports.getName = function(node) {

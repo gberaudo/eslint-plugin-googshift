@@ -6,9 +6,9 @@ module.exports = {
     'no-duplicate-requires': require('./no-duplicate-requires').rule,
     'no-missing-requires': require('./no-missing-requires').rule,
     'no-unused-requires': require('./no-unused-requires').rule,
-    'one-provide': require('./one-provide').rule,
+    'one-provide-or-module': require('./one-provide-or-module').rule,
     'requires-first': require('./requires-first').rule,
-    'valid-provide': require('./valid-provide').rule,
+    'valid-provide-and-module': require('./valid-provide-and-module').rule,
     'valid-requires': require('./valid-requires').rule
   }
 };

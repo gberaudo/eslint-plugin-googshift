@@ -1,24 +1,22 @@
 {
-  "name": "eslint-plugin-openlayers-internal",
+  "name": "eslint-plugin-googshift",
   "version": "3.1.0",
   "description": "Custom ESLint rules for the OpenLayers project",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/openlayers/eslint-plugin-openlayers-internal.git"
+    "url": "git://github.com/gberaudo/eslint-plugin-googshift.git"
   },
   "license": "BSD-2-Clause",
   "scripts": {
     "test": "eslint ."
   },
   "eslintConfig": {
-    "extends": "openlayers",
     "env": {
       "es6": true
     }
   },
   "devDependencies": {
-    "eslint": "^3.12.2",
-    "eslint-config-openlayers": "^6.0.0"
+    "eslint": "^3.12.2"
   }
 }

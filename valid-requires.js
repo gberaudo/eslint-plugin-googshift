@@ -14,11 +14,14 @@ exports.rule = {
       CallExpression: function(expression) {
         if (util.isRequireExpression(expression)) {
           const parent = expression.parent;
-          if (parent.type !== 'ExpressionStatement') {
-            return context.report(expression, 'Expected goog.require() to be in an expression statement');
+          const parentIsExpression = parent.type === 'ExpressionStatement';
+          const parentIsVariableDeclarator = parent.type === 'VariableDeclarator';
+          if (!parentIsExpression && !parentIsVariableDeclarator) {
+            return context.report(expression, 'Expected goog.require() to be in an expression or variable declarator statement');
           }
 
-          if (parent.parent.type !== 'Program') {
+          const expectedProgram = parentIsExpression ? parent.parent : parent.parent.parent;
+          if (expectedProgram.type !== 'Program') {
             return context.report(expression, 'Expected goog.require() to be at the top level');
           }
 
