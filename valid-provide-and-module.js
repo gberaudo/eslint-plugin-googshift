@@ -54,7 +54,7 @@ exports.rule = {
           }
           const expectedPath = name.split('.').join(path.sep) + ext;
           if (expectedPath.toLowerCase() !== requirePath.toLowerCase()) {
-            return context.report(expression, `Expected goog.${type}('${name}') to be like ${requirePath}`);
+            return context.report(expression, `Expected goog.${type}('${name}') to be at ${expectedPath.toLowerCase()} instead of ${requirePath.toLowerCase()}`);
           }
         }
       }
