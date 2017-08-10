@@ -1,7 +1,7 @@
 {
   "name": "eslint-plugin-googshift",
-  "version": "3.1.0",
-  "description": "Custom ESLint rules for the OpenLayers project",
+  "version": "0.9.0",
+  "description": "Custom ESLint rules for checking Google Compiler projects",
   "main": "index.js",
   "repository": {
     "type": "git",
