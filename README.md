@@ -5,8 +5,7 @@ rules are meant to help with the transition away from the Closure Library and
 may be removed when that is complete.
 
 
-# Example use:
-
+# Example use
 
 In your .eslintrc.yaml:
 ```yaml
@@ -50,3 +49,8 @@ In a dedicated eslintrc file .eslintrc-googshift.yaml:
 }
 
 ```
+
+
+# Acknowledgments
+
+This work is a continuation and generalization of an initial work from Tim Schaub.
