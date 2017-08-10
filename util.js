@@ -1,6 +1,9 @@
 'use strict';
 
 function isGoogCallExpression(node, name) {
+  if (!node) {
+    return false;
+  }
   const callee = node.callee;
   return callee && callee.type === 'MemberExpression' &&
       callee.object.type === 'Identifier' && callee.object.name === 'goog' &&
