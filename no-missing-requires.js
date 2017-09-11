@@ -31,9 +31,24 @@ exports.rule = {
     const CLASS_RE = new RegExp(`^((?:${joined})(\\.[a-z]\\w*)*\\.[A-Z]\\w*)(\\.\\w+)*$`);
     const STARTS_WITH = new RegExp(`^(?:${joined})\\..*`);
 
+    const fixedRequires = new Set();
+    let provideOrModuleElement;
+
+    function fixRequire(fixer, symbol) {
+      // FIXME: how to get the first comment or token in case there is no provide / module?
+      if (provideOrModuleElement && !fixedRequires.has(symbol)) {
+        fixedRequires.add(symbol);
+        return fixer.insertTextAfter(provideOrModuleElement, `\ngoog.require('${symbol}');`);
+      }
+    };
+
     return {
 
       ExpressionStatement: function(statement) {
+        if (util.isProvideStatement(statement) || util.isModuleStatement(statement)) {
+          provideOrModuleElement = statement;
+        }
+
         if (util.isRequireStatement(statement) || util.isRequireVariableDeclaration(statement) || util.isProvideStatement(statement)) {
           const expression = statement.expression;
           const arg = expression.arguments[0];
@@ -61,7 +76,13 @@ exports.rule = {
             let match = name.match(CONST_RE);
             if (match) {
               if (!defined[match[1]]) {
-                context.report(expression, `Missing goog.require('${match[1]}')`);
+                context.report({
+                  node: expression,
+                  message: `A. missing goog.require('${match[1]}')`,
+                  fix: function(fixer) {
+                    return fixRequire(fixer, match[1]);
+                  }
+                });
               }
               return;
             }
@@ -77,13 +98,25 @@ exports.rule = {
                 // ol.source.XYZ -> require('ol.source.XYZ')
                 const objectName = parts.slice(0, -1).join('.');
                 if (!defined[className] && !defined[objectName]) {
-                  context.report(expression, `Missing goog.require('${className}') or goog.require('${objectName}')`);
+                  context.report({
+                    node: expression,
+                    message: `B. missing goog.require('${className}') or goog.require('${objectName}')`,
+                    fix: function(fixer) {
+                      return fixRequire(fixer, className);
+                    }
+                  });
                 }
                 return;
               }
               const parentObjectName = className.split('.').slice(0, -1).join('.'); // app.constants.RouteType enum in constants namespace
               if (!defined[className] && !defined[parentObjectName]) {
-                context.report(expression, `Missing goog.require('${className}') or goog.require('${parentObjectName}')`);
+                  context.report({
+                    node: expression,
+                    message: `C. missing goog.require('${className}') or goog.require('${parentObjectName}')`,
+                    fix: function(fixer) {
+                      return fixRequire(fixer, className);
+                    }
+                  });
               }
               return;
             }
@@ -96,7 +129,13 @@ exports.rule = {
             const objectName = parts.join('.');
             const parentObjectName = parts.slice(0, -1).join('.'); // app.widgets.sortable.dragOptionsDirective.module
             if (!defined[objectName] && !defined[parentObjectName]) {
-              context.report(expression, `Missing goog.require('${objectName}') or goog.require('${parentObjectName}')`);
+              context.report({
+                node: expression,
+                message: `D. missing goog.require('${objectName}') or goog.require('${parentObjectName}')`,
+                fix: function(fixer) {
+                  return fixRequire(fixer, objectName);
+                }
+              });
             }
           }
         }
