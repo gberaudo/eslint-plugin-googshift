@@ -34,8 +34,7 @@ exports.rule = {
     const fixedRequires = new Set();
     let provideOrModuleElement;
 
-    function fixRequire(fixer, symbol) {
-      // FIXME: how to get the first comment or token in case there is no provide / module?
+    function fixRequire(fixer, node, symbol) {
       if (provideOrModuleElement && !fixedRequires.has(symbol)) {
         fixedRequires.add(symbol);
         return fixer.insertTextAfter(provideOrModuleElement, `\ngoog.require('${symbol}');`);
@@ -80,7 +79,7 @@ exports.rule = {
                   node: expression,
                   message: `A. missing goog.require('${match[1]}')`,
                   fix: function(fixer) {
-                    return fixRequire(fixer, match[1]);
+                    return fixRequire(fixer, expression, match[1]);
                   }
                 });
               }
@@ -102,7 +101,7 @@ exports.rule = {
                     node: expression,
                     message: `B. missing goog.require('${className}') or goog.require('${objectName}')`,
                     fix: function(fixer) {
-                      return fixRequire(fixer, className);
+                      return fixRequire(fixer, expression, className);
                     }
                   });
                 }
@@ -114,7 +113,7 @@ exports.rule = {
                     node: expression,
                     message: `C. missing goog.require('${className}') or goog.require('${parentObjectName}')`,
                     fix: function(fixer) {
-                      return fixRequire(fixer, className);
+                      return fixRequire(fixer, expression, className);
                     }
                   });
               }
@@ -133,7 +132,7 @@ exports.rule = {
                 node: expression,
                 message: `D. missing goog.require('${objectName}') or goog.require('${parentObjectName}')`,
                 fix: function(fixer) {
-                  return fixRequire(fixer, objectName);
+                  return fixRequire(fixer, expression, objectName);
                 }
               });
             }
