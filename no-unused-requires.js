@@ -72,7 +72,7 @@ exports.rule = {
               node: unusedRequire,
               message: `Unused ${source.getText(unusedRequire)}`,
               fix: function(fixer) {
-                const afterToken = source.getTokenAfter(unusedRequire);
+                const afterToken = source.getTokenAfter(unusedRequire, {includeComments: true});
                 const range = [
                   unusedRequire.range[0],
                   afterToken ? afterToken.range[0] : unusedRequire.range[1]

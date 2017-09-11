@@ -30,7 +30,7 @@ exports.rule = {
               node: statement,
               message: `Duplicate goog.require('${name}')`,
               fix: function(fixer) {
-                const afterToken = source.getTokenAfter(statement);
+                const afterToken = source.getTokenAfter(statement, {includeComments: true});
                 const range = [
                   statement.range[0],
                   afterToken ? afterToken.range[0] : statement.range[1]
