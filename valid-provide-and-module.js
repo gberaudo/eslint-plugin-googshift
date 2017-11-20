@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const pkgDir = require('pkg-dir');
 const util = require('./util');
 
 exports.rule = {
@@ -44,7 +45,7 @@ exports.rule = {
           }
 
           const filePath = context.getFilename();
-          const sourceRoot = path.join(process.cwd(), relativeSourceRoot);
+          const sourceRoot = path.join(pkgDir.sync(filePath), relativeSourceRoot);
           const requirePath = path.relative(sourceRoot, filePath);
           const ext = '.js';
           let name = arg.value;
