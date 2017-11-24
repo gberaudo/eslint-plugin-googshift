@@ -14,6 +14,10 @@ exports.rule = {
   create: function(context) {
     const entryPoints = context.options[0].entryPoints || ['ol'];
     const relativeSourceRoot = context.options[0].root || 'src';
+    let replace = context.options[0].replace;
+    if (replace) {
+      replace = replace.split('|');
+    }
     let gotFirst = false;
     return {
       CallExpression: function(expression) {
@@ -46,7 +50,7 @@ exports.rule = {
 
           const filePath = context.getFilename();
           const sourceRoot = path.join(pkgDir.sync(filePath), relativeSourceRoot);
-          const requirePath = path.relative(sourceRoot, filePath);
+          let requirePath = path.relative(sourceRoot, filePath);
           const ext = '.js';
           let name = arg.value;
           // special case for main entry point
@@ -54,6 +58,9 @@ exports.rule = {
             name += '.index';
           }
           const expectedPath = name.split('.').join(path.sep) + ext;
+          if (replace) {
+            requirePath = requirePath.replace(replace[0], replace[1]);
+          }
           if (expectedPath.toLowerCase() !== requirePath.toLowerCase()) {
             return context.report(expression, `Expected goog.${type}('${name}') to be at ${expectedPath.toLowerCase()} instead of ${requirePath.toLowerCase()}`);
           }
