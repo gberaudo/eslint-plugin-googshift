@@ -18,5 +18,8 @@
   },
   "devDependencies": {
     "eslint": "^3.12.2"
+  },
+  "dependencies": {
+    "pkg-dir": "^2.0.0"
   }
 }
