@@ -27,7 +27,8 @@ In a dedicated eslintrc file .eslintrc-googshift.yaml:
     'googshift/no-duplicate-requires': 'error',
 
     'googshift/no-missing-requires': ['error', {
-      prefixes: ['app', 'ol', 'ngeo']
+      prefixes: ['app', 'ol', 'ngeo'],
+      exceptions: ['ngeo.module.requires.push']
     }],
 
     'googshift/no-unused-requires': 'error',

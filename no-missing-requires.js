@@ -26,6 +26,7 @@ exports.rule = {
   create: function(context) {
     const defined = {};
     const prefixes = context.options[0].prefixes || ['ol'];
+    const exceptions = context.options[0].exceptions || [];
     const joined = prefixes.join('|');
     const CONST_RE = new RegExp(`^((?:${joined})(\\.[a-z]\\w*)*)\\.[A-Z]+_([_A-Z])+$`);
     const CLASS_RE = new RegExp(`^((?:${joined})(\\.[a-z]\\w*)*\\.[A-Z]\\w*)(\\.\\w+)*$`);
@@ -70,7 +71,7 @@ exports.rule = {
 
         if (parent.type !== 'MemberExpression') {
           const name = util.getName(expression);
-          if (name && STARTS_WITH.test(name) && !defined[name]) {
+          if (name && STARTS_WITH.test(name) && !defined[name] && exceptions.indexOf(name) < 0) {
             // check if the name looks like a const
             let match = name.match(CONST_RE);
             if (match) {
